@@ -1,9 +1,11 @@
-from datetime import datetime, timezone
-from fastapi import FastAPI, Depends
+from datetime import datetime, timezone, timedelta
+from typing import Optional
+from fastapi import FastAPI, Depends, Query
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared import get_session, Metric
-from .schemas import MetricCreate
+from .schemas import MetricCreate, MetricResponse
 
 app = FastAPI(
     title="Nazar API",
@@ -31,3 +33,24 @@ async def ingest_metric(metric: MetricCreate, session: AsyncSession = Depends(ge
     session.add(db_metric)
     await session.commit()
     return {"status": "ok"}
+
+
+@app.get("/metrics", response_model=list[MetricResponse])
+async def get_metrics(
+    host: Optional[str] = None,
+    start: Optional[datetime] = None,
+    end: Optional[datetime] = None,
+    limit: int = Query(default=100, le=1000),
+    session: AsyncSession = Depends(get_session),
+):
+    query = select(Metric).order_by(Metric.timestamp.desc()).limit(limit)
+
+    if host:
+        query = query.where(Metric.host == host)
+    if start:
+        query = query.where(Metric.timestamp >= start)
+    if end:
+        query = query.where(Metric.timestamp <= end)
+
+    result = await session.execute(query)
+    return result.scalars().all()
