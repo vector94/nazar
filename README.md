@@ -1,7 +1,5 @@
 # Nazar
 
-**Every production system fails sometimes, no matter how carefully it's built. The difference is whether you catch it before your users do.**
-
 Nazar is a performance monitoring platform that collects server metrics, detects anomalies using statistical and ML approaches, and alerts you before small issues become outages. Cloud infrastructure, on-premise servers, or containerized applications: if it generates metrics, Nazar can monitor it.
 
 ## Features
