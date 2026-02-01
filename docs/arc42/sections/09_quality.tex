@@ -1,0 +1,98 @@
+\section{Quality Requirements}
+\label{sec:quality}
+
+% ============================================================================
+\subsection{Quality Attribute Scenarios}
+\label{subsec:qa-scenarios}
+
+\subsubsection{QAS-1: Performance - Metric Ingestion}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|X|}
+\hline
+\textbf{Source} & Monitored servers \\
+\hline
+\textbf{Stimulus} & 1000+ metrics per second \\
+\hline
+\textbf{Artifact} & API Server \\
+\hline
+\textbf{Environment} & Normal operation \\
+\hline
+\textbf{Response} & Accept and queue all metrics \\
+\hline
+\textbf{Measure} & 95\% of requests complete in < 100ms \\
+\hline
+\end{tabularx}
+\caption{QAS-1: Metric Ingestion Performance}
+\label{tab:qas1}
+\end{table}
+
+\subsubsection{QAS-2: Reliability - System Availability}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|X|}
+\hline
+\textbf{Source} & Infrastructure incident \\
+\hline
+\textbf{Stimulus} & Component failure or high load \\
+\hline
+\textbf{Artifact} & Entire system \\
+\hline
+\textbf{Environment} & Production \\
+\hline
+\textbf{Response} & Continue collecting metrics, queue alerts \\
+\hline
+\textbf{Measure} & No metric data loss during partial failures \\
+\hline
+\end{tabularx}
+\caption{QAS-2: System Availability}
+\label{tab:qas2}
+\end{table}
+
+\subsubsection{QAS-3: Accuracy - Anomaly Detection}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|X|}
+\hline
+\textbf{Source} & Analysis Worker \\
+\hline
+\textbf{Stimulus} & Unusual metric pattern \\
+\hline
+\textbf{Artifact} & Anomaly detection module \\
+\hline
+\textbf{Environment} & After baseline learning period \\
+\hline
+\textbf{Response} & Generate alert with appropriate severity \\
+\hline
+\textbf{Measure} & < 5\% false positive rate \\
+\hline
+\end{tabularx}
+\caption{QAS-3: Anomaly Detection Accuracy}
+\label{tab:qas3}
+\end{table}
+
+% ============================================================================
+\subsection{Quality Tree}
+\label{subsec:quality-tree}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|L{3cm}|X|c|}
+\hline
+\textbf{Quality} & \textbf{Attribute} & \textbf{Scenario} & \textbf{Priority} \\
+\hline
+Performance & Throughput & QAS-1: Handle 1000+ metrics/sec & H, H \\
+\hline
+Reliability & Availability & QAS-2: No data loss during failures & H, M \\
+\hline
+Accuracy & Detection & QAS-3: Low false positive rate & H, M \\
+\hline
+\end{tabularx}
+\caption{Quality Tree}
+\label{tab:quality-tree}
+\end{table}
+
+\textit{Priority: (Business Importance, Technical Risk) - H=High, M=Medium}

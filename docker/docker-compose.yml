@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    container_name: nazar-db
+    environment:
+      POSTGRES_USER: nazar
+      POSTGRES_PASSWORD: nazar123
+      POSTGRES_DB: nazar
+    ports:
+      - "5432:5432"
+    volumes:
+      - timescale_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: nazar-mq
+    environment:
+      RABBITMQ_DEFAULT_USER: nazar
+      RABBITMQ_DEFAULT_PASS: nazar123
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  timescale_data:
+  rabbitmq_data:

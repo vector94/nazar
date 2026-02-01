@@ -1,0 +1,25 @@
+@startuml c4_component_api
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Component Diagram - API Server
+
+Container_Boundary(api, "API Server") {
+    Component(ingestion, "Ingestion Controller", "FastAPI Router", "Receives metrics from agents")
+    Component(query, "Query Controller", "FastAPI Router", "Serves dashboard queries")
+    Component(config, "Config Controller", "FastAPI Router", "Manages alert rules")
+    Component(auth, "Auth Module", "Python", "Authentication & authorization")
+    Component(publisher, "Message Publisher", "Pika", "Publishes to RabbitMQ")
+    Component(repo, "Metric Repository", "SQLAlchemy", "Database access layer")
+}
+
+ContainerQueue(mq, "RabbitMQ", "Message Broker")
+ContainerDb(db, "TimescaleDB", "Database")
+
+Rel(ingestion, publisher, "Publishes metrics")
+Rel(ingestion, repo, "Writes metrics")
+Rel(query, repo, "Reads metrics")
+Rel(config, repo, "Reads/Writes rules")
+Rel(publisher, mq, "AMQP")
+Rel(repo, db, "SQL")
+
+@enduml

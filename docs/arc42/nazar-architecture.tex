@@ -1,0 +1,188 @@
+\documentclass[12pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{times}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{tocloft}
+
+% Page geometry
+\setlength{\headheight}{23pt}
+
+% Define colors
+\definecolor{primaryblue}{RGB}{0, 82, 147}
+\definecolor{darkgray}{RGB}{64, 64, 64}
+\definecolor{lightgray}{RGB}{200, 200, 200}
+
+% Table of contents formatting
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setcounter{tocdepth}{2}
+\setlength{\cftbeforesecskip}{0.3cm}
+
+% Hyperref setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primaryblue,
+    filecolor=magenta,
+    urlcolor=cyan,
+    pdftitle={Nazar - Software Architecture Document},
+    pdfauthor={Md Asif Iqbal Ahmed},
+}
+
+% Custom commands
+\newcommand{\projectname}{Nazar}
+
+% Table column types
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\begin{document}
+
+% ============================================================================
+% COVER PAGE
+% ============================================================================
+\begin{titlepage}
+    \begin{tikzpicture}[remember picture, overlay]
+        % Top accent bar
+        \fill[primaryblue] (current page.north west) rectangle ([yshift=-3cm]current page.north east);
+        % Bottom accent bar
+        \fill[primaryblue] (current page.south west) rectangle ([yshift=2cm]current page.south east);
+    \end{tikzpicture}
+
+    \vspace*{2cm}
+
+    \begin{center}
+        % Main title
+        {\fontsize{42}{50}\selectfont\bfseries\color{primaryblue} \projectname}
+
+        \vspace{1cm}
+
+        % Horizontal rule
+        {\color{lightgray}\rule{0.6\textwidth}{1pt}}
+
+        \vspace{1cm}
+
+        % Subtitle
+        {\LARGE\bfseries Software Architecture Document}
+
+        \vspace{0.5cm}
+
+        {\Large\color{darkgray} Performance Data Storage \& Analysis Platform}
+
+        \vspace{0.5cm}
+
+        {\large\color{darkgray} ARC42 Template}
+
+        \vspace{3cm}
+
+        % Description box
+        \fcolorbox{lightgray}{white}{
+            \begin{minipage}{0.75\textwidth}
+                \centering
+                \vspace{0.5cm}
+                {\itshape A system performance monitoring and analysis platform designed to help DevOps engineers and system administrators monitor server infrastructure health through intelligent anomaly detection and alerting.}
+                \vspace{0.5cm}
+            \end{minipage}
+        }
+
+        \vfill
+
+        % Authors section
+        {\color{lightgray}\rule{0.4\textwidth}{0.5pt}}
+
+        \vspace{0.8cm}
+
+        {\large\bfseries Author}
+
+        \vspace{0.5cm}
+
+        \begin{tabular}{c}
+            Md Asif Iqbal Ahmed \\
+            {\small\texttt{asif.ahmed9414@gmail.com}} \\
+        \end{tabular}
+
+        \vspace{1.5cm}
+
+        % Version
+        {\color{darkgray}
+            \begin{tabular}{rl}
+                \textbf{Version:} & 1.0 \\
+            \end{tabular}
+        }
+
+    \end{center}
+\end{titlepage}
+
+% ============================================================================
+% SETUP PAGE STYLE (Headers & Footers)
+% ============================================================================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\projectname\\Software Architecture Document}
+\fancyhead[R]{ARC42}
+\fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% ============================================================================
+% TABLE OF CONTENTS
+% ============================================================================
+\tableofcontents
+\thispagestyle{fancy}
+\newpage
+
+% List of figures and tables
+\listoffigures
+\listoftables
+\thispagestyle{fancy}
+\newpage
+
+% ============================================================================
+% CONTENT SECTIONS
+% ============================================================================
+\input{sections/01_introduction}
+\newpage
+
+\input{sections/02_constraints}
+\newpage
+
+\input{sections/03_context}
+\newpage
+
+\input{sections/04_solution_strategy}
+\newpage
+
+\input{sections/05_building_blocks}
+\newpage
+
+\input{sections/06_runtime}
+\newpage
+
+\input{sections/07_crosscutting}
+\newpage
+
+\input{sections/08_decisions}
+\newpage
+
+\input{sections/09_quality}
+\newpage
+
+\input{sections/10_glossary}
+
+\end{document}

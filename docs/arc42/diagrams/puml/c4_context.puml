@@ -1,0 +1,21 @@
+@startuml c4_context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+title System Context Diagram - Nazar
+
+Person(user, "DevOps Engineer", "Monitors infrastructure and responds to alerts")
+
+System(nazar, "Nazar", "Collects metrics, detects anomalies, sends alerts")
+
+System_Ext(servers, "Monitored Servers", "Servers running metric agents")
+System_Ext(slack, "Slack", "Team communication")
+System_Ext(email, "Email Service", "SMTP delivery")
+System_Ext(external, "External Apps", "Third-party metric sources")
+
+Rel(servers, nazar, "Push metrics", "HTTPS")
+Rel(external, nazar, "Push metrics", "REST API")
+Rel(user, nazar, "Views dashboards", "HTTPS")
+Rel(nazar, slack, "Sends alerts", "Webhook")
+Rel(nazar, email, "Sends alerts", "SMTP")
+
+@enduml

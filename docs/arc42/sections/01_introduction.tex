@@ -1,0 +1,77 @@
+\section{Introduction and Goals}
+\label{sec:introduction}
+
+Nazar is a performance monitoring platform that collects server metrics, detects anomalies, and alerts users when issues arise.
+
+% ============================================================================
+\subsection{Requirements Overview}
+\label{subsec:requirements-overview}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|c|L{2.8cm}|X|}
+\hline
+\textbf{ID} & \textbf{Functionality} & \textbf{Description} \\
+\hline
+F1 & Metric Collection & Gather CPU, memory, disk, and network metrics via agents or REST API \\
+\hline
+F2 & Time-Series Storage & Store metrics with automatic retention and compression \\
+\hline
+F3 & Statistical Analysis & Detect threshold violations using historical baselines \\
+\hline
+F4 & ML Anomaly Detection & Learn normal patterns and flag unusual behavior \\
+\hline
+F5 & Alerting & Send notifications via dashboard, Slack, or email \\
+\hline
+F6 & Web Dashboard & Visualize metrics, explore history, configure rules \\
+\hline
+F7 & REST API & Ingest external metrics and enable integrations \\
+\hline
+\end{tabularx}
+\caption{Main Functional Requirements}
+\label{tab:requirements}
+\end{table}
+
+% ============================================================================
+\subsection{Stakeholders}
+\label{subsec:stakeholders}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{3.2cm}|X|}
+\hline
+\textbf{Who?} & \textbf{Goals and Concerns} \\
+\hline
+DevOps Engineers & Fast anomaly detection, low false positives, CI/CD integration \\
+\hline
+System Administrators & Full infrastructure visibility, reliable alerts, low overhead \\
+\hline
+Development Teams & Correlate performance with deployments, custom metrics \\
+\hline
+Operations Managers & High-level dashboards, SLA tracking, capacity planning \\
+\hline
+\end{tabularx}
+\caption{Stakeholder Concerns}
+\label{tab:stakeholders}
+\end{table}
+
+% ============================================================================
+\subsection{Quality Goals}
+\label{subsec:quality-goals}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.2cm}|X|L{2.2cm}|}
+\hline
+\textbf{Quality Goal} & \textbf{Motivation} & \textbf{Related Req.} \\
+\hline
+Q1: Performance & Handle thousands of metrics per second with fast query response & F1, F2, F6 \\
+\hline
+Q2: Reliability & Stay available during incidents when monitoring matters most & F1, F2, F5 \\
+\hline
+Q3: Accuracy & Minimize false positives and false negatives in anomaly detection & F3, F4, F5 \\
+\hline
+\end{tabularx}
+\caption{Top Quality Goals}
+\label{tab:quality-goals}
+\end{table}

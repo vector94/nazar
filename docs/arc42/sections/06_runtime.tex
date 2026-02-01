@@ -1,0 +1,88 @@
+\section{Runtime View}
+\label{sec:runtime}
+
+This section describes the behavior of Nazar's building blocks through two key runtime scenarios.
+
+% ============================================================================
+\subsection{Runtime Scenario 1: Metric Collection and Storage}
+\label{subsec:runtime-scenario1}
+
+This scenario shows how metrics flow from monitored servers into the system.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{diagrams/images/sequence_metric_collection.png}
+    \caption{Metric Collection and Storage Flow}
+    \label{fig:sequence-collection}
+\end{figure}
+
+\subsubsection{Interaction Steps}
+
+\begin{enumerate}
+    \item Monitored server pushes metrics to API Server via HTTPS POST
+    \item API Server stores metrics in TimescaleDB
+    \item API Server publishes metrics to RabbitMQ for async processing
+    \item API Server returns 202 Accepted to the server
+\end{enumerate}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{3cm}|X|}
+\hline
+\textbf{Component} & \textbf{Role} \\
+\hline
+Monitored Server & Collects and pushes system metrics \\
+\hline
+API Server & Receives, validates, and routes metrics \\
+\hline
+TimescaleDB & Persists time-series metric data \\
+\hline
+RabbitMQ & Queues metrics for analysis processing \\
+\hline
+\end{tabularx}
+\caption{Scenario 1: Participating Components}
+\label{tab:scenario1-blocks}
+\end{table}
+
+% ============================================================================
+\subsection{Runtime Scenario 2: Anomaly Detection and Alerting}
+\label{subsec:runtime-scenario2}
+
+This scenario shows how anomalies are detected and alerts are delivered.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{diagrams/images/sequence_anomaly_alerting.png}
+    \caption{Anomaly Detection and Alerting Flow}
+    \label{fig:sequence-alerting}
+\end{figure}
+
+\subsubsection{Interaction Steps}
+
+\begin{enumerate}
+    \item Analysis Worker consumes metrics from RabbitMQ
+    \item Worker queries TimescaleDB for historical baseline data
+    \item Worker analyzes metrics and detects anomalies
+    \item Worker stores alert record in TimescaleDB
+    \item Worker sends notifications via Slack and Email
+    \item DevOps Engineer receives alert notification
+\end{enumerate}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{3cm}|X|}
+\hline
+\textbf{Component} & \textbf{Role} \\
+\hline
+RabbitMQ & Delivers metric messages to worker \\
+\hline
+Analysis Worker & Detects anomalies and triggers alerts \\
+\hline
+TimescaleDB & Provides baseline data and stores alerts \\
+\hline
+Slack / Email & Delivers notifications to users \\
+\hline
+\end{tabularx}
+\caption{Scenario 2: Participating Components}
+\label{tab:scenario2-blocks}
+\end{table}

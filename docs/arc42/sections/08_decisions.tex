@@ -1,0 +1,141 @@
+\section{Architectural Decisions}
+\label{sec:decisions}
+
+% ============================================================================
+\subsection{ADR-001: Modular Monolith}
+\label{subsec:adr001}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|X|}
+\hline
+\textbf{Context} & Solo developer project; need simple but organized architecture \\
+\hline
+\textbf{Alternatives} & Clean Architecture, Microservices \\
+\hline
+\textbf{Decision} & Modular monolith - simpler than Clean Architecture for solo project \\
+\hline
+\textbf{Consequences} & + Simpler deployment and debugging \newline + Can split into microservices later if needed \newline - Must maintain discipline on module boundaries \\
+\hline
+\end{tabularx}
+\caption{ADR-001: Modular Monolith}
+\label{tab:adr001}
+\end{table}
+
+% ============================================================================
+\subsection{ADR-002: Event-Driven Architecture}
+\label{subsec:adr002}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|X|}
+\hline
+\textbf{Context} & Metric ingestion and analysis have different performance characteristics \\
+\hline
+\textbf{Decision} & Use event-driven architecture with message queues between components \\
+\hline
+\textbf{Consequences} & + Components scale independently \newline + Ingestion not blocked by slow analysis \newline - Eventual consistency, harder to debug \\
+\hline
+\end{tabularx}
+\caption{ADR-002: Event-Driven Architecture}
+\label{tab:adr002}
+\end{table}
+
+% ============================================================================
+\subsection{ADR-003: Push-based Metric Collection}
+\label{subsec:adr003}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|X|}
+\hline
+\textbf{Context} & Need to collect metrics from servers; can use push (agents send) or pull (server scrapes) \\
+\hline
+\textbf{Decision} & Use push-based collection where agents POST metrics to API \\
+\hline
+\textbf{Consequences} & + Works through firewalls, no inbound ports needed \newline + Agents control send frequency \newline - Server must handle burst traffic \\
+\hline
+\end{tabularx}
+\caption{ADR-003: Push-based Metric Collection}
+\label{tab:adr003}
+\end{table}
+
+% ============================================================================
+\subsection{ADR-004: Message Broker Selection}
+\label{subsec:adr004}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|X|}
+\hline
+\textbf{Context} & Need async processing; also wanted to learn message broker technology \\
+\hline
+\textbf{Alternatives} & Direct processing (no broker), Kafka \\
+\hline
+\textbf{Decision} & RabbitMQ - good learning opportunity, simpler than Kafka \\
+\hline
+\textbf{Consequences} & + Reliable message delivery with acknowledgments \newline + Buffers load spikes \newline - Additional infrastructure component to manage \\
+\hline
+\end{tabularx}
+\caption{ADR-004: Message Broker Selection}
+\label{tab:adr004}
+\end{table}
+
+% ============================================================================
+\subsection{ADR-005: Time-Series Database Selection}
+\label{subsec:adr005}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|X|}
+\hline
+\textbf{Context} & Need efficient storage for timestamped metrics with fast range queries \\
+\hline
+\textbf{Alternatives} & InfluxDB, plain PostgreSQL \\
+\hline
+\textbf{Decision} & TimescaleDB - SQL compatible, leverages existing PostgreSQL knowledge \\
+\hline
+\textbf{Consequences} & + Automatic partitioning and compression \newline + Full PostgreSQL ecosystem \newline - Additional complexity vs plain PostgreSQL \\
+\hline
+\end{tabularx}
+\caption{ADR-005: Time-Series Database Selection}
+\label{tab:adr005}
+\end{table}
+
+% ============================================================================
+\subsection{ADR-006: Anomaly Detection Approach}
+\label{subsec:adr006}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|X|}
+\hline
+\textbf{Context} & Simple thresholds miss subtle anomalies; pure ML can be hard to tune \\
+\hline
+\textbf{Decision} & Use hybrid approach: statistical baselines + ML (Isolation Forest) \\
+\hline
+\textbf{Consequences} & + Catches both obvious and subtle anomalies \newline + Statistical methods are interpretable \newline - More complex than threshold-only approach \\
+\hline
+\end{tabularx}
+\caption{ADR-006: Anomaly Detection Approach}
+\label{tab:adr006}
+\end{table}
+
+% ============================================================================
+\subsection{ADR-007: Alert Delivery Strategy}
+\label{subsec:adr007}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|X|}
+\hline
+\textbf{Context} & Users need timely alerts without notification fatigue \\
+\hline
+\textbf{Decision} & Multi-channel delivery (Slack, Email) with cooldowns and grouping \\
+\hline
+\textbf{Consequences} & + Reaches users on preferred channels \newline + Cooldowns prevent alert spam \newline - More complex notification logic \\
+\hline
+\end{tabularx}
+\caption{ADR-007: Alert Delivery Strategy}
+\label{tab:adr007}
+\end{table}

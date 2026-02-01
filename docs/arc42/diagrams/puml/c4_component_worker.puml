@@ -1,0 +1,32 @@
+@startuml c4_component_worker
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Component Diagram - Analysis Worker
+
+Container_Boundary(worker, "Analysis Worker") {
+    Component(consumer, "Message Consumer", "Pika", "Receives metrics from queue")
+    Component(stats, "Statistical Analyzer", "Python", "Threshold & baseline detection")
+    Component(ml, "ML Detector", "Scikit-learn", "Pattern-based anomaly detection")
+    Component(alertmgr, "Alert Manager", "Python", "Alert rules, cooldowns, grouping")
+    Component(notifier, "Notifier", "Python", "Sends to Slack, Email")
+    Component(repo, "Metric Repository", "SQLAlchemy", "Database access layer")
+}
+
+ContainerQueue(mq, "RabbitMQ", "Message Broker")
+ContainerDb(db, "TimescaleDB", "Database")
+System_Ext(slack, "Slack")
+System_Ext(email, "Email")
+
+Rel(consumer, mq, "Consumes", "AMQP")
+Rel(consumer, stats, "Forwards metrics")
+Rel(consumer, ml, "Forwards metrics")
+Rel(stats, alertmgr, "Triggers alerts")
+Rel(ml, alertmgr, "Triggers alerts")
+Rel(alertmgr, notifier, "Sends alerts")
+Rel(notifier, slack, "Webhook")
+Rel(notifier, email, "SMTP")
+Rel(stats, repo, "Reads baselines")
+Rel(ml, repo, "Reads history")
+Rel(repo, db, "SQL")
+
+@enduml

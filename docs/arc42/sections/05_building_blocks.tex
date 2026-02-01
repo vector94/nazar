@@ -1,0 +1,98 @@
+\section{Building Block View}
+\label{sec:building-blocks}
+
+% ============================================================================
+\subsection{Level 1: Container Diagram}
+\label{subsec:level1}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{diagrams/images/c4_container.png}
+    \caption{Level 1 - Container Diagram}
+    \label{fig:container-diagram}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.8cm}|X|}
+\hline
+\textbf{Container} & \textbf{Purpose} \\
+\hline
+Web Dashboard & React frontend for metric visualization and alert configuration \\
+\hline
+API Server & FastAPI backend handling REST endpoints and metric ingestion \\
+\hline
+Analysis Worker & Python service for anomaly detection and alert triggering \\
+\hline
+Message Broker & RabbitMQ for async communication between API and Worker \\
+\hline
+Database & TimescaleDB for time-series metric storage \\
+\hline
+\end{tabularx}
+\caption{Level 1 Building Blocks}
+\label{tab:level1-blocks}
+\end{table}
+
+% ============================================================================
+\subsection{Level 2: API Server Components}
+\label{subsec:level2-api}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{diagrams/images/c4_component_api.png}
+    \caption{Level 2 - API Server Components}
+    \label{fig:component-api}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{3cm}|X|}
+\hline
+\textbf{Component} & \textbf{Purpose} \\
+\hline
+Ingestion Controller & Receives metrics from agents and external sources \\
+\hline
+Query Controller & Serves metric queries for the dashboard \\
+\hline
+Config Controller & Manages alert rules and thresholds \\
+\hline
+Message Publisher & Publishes metrics to RabbitMQ \\
+\hline
+Metric Repository & Abstracts database access \\
+\hline
+\end{tabularx}
+\caption{API Server Components}
+\label{tab:api-components}
+\end{table}
+
+% ============================================================================
+\subsection{Level 2: Analysis Worker Components}
+\label{subsec:level2-worker}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{diagrams/images/c4_component_worker.png}
+    \caption{Level 2 - Analysis Worker Components}
+    \label{fig:component-worker}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{3cm}|X|}
+\hline
+\textbf{Component} & \textbf{Purpose} \\
+\hline
+Message Consumer & Receives metrics from RabbitMQ \\
+\hline
+Statistical Analyzer & Detects threshold violations and baseline deviations \\
+\hline
+ML Detector & Machine learning based anomaly detection \\
+\hline
+Alert Manager & Handles alert rules, cooldowns, and grouping \\
+\hline
+Notifier & Sends alerts to Slack and Email \\
+\hline
+\end{tabularx}
+\caption{Analysis Worker Components}
+\label{tab:worker-components}
+\end{table}

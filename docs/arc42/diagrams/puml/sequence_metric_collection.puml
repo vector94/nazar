@@ -1,0 +1,16 @@
+@startuml sequence_metric_collection
+!theme plain
+
+title Metric Collection and Storage
+
+actor "Monitored Server" as Server
+participant "API Server" as API
+queue "RabbitMQ" as MQ
+database "TimescaleDB" as DB
+
+Server -> API : POST /api/v1/metrics
+API -> DB : Store metrics
+API -> MQ : Publish to queue
+API --> Server : 202 Accepted
+
+@enduml

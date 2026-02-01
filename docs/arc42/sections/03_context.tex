@@ -1,0 +1,38 @@
+\section{Context and Scope}
+\label{sec:context}
+
+% ============================================================================
+\subsection{System Context Diagram}
+\label{subsec:context-diagram}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{diagrams/images/c4_context.png}
+    \caption{System Context Diagram}
+    \label{fig:context-diagram}
+\end{figure}
+
+% ============================================================================
+\subsection{External Entities}
+\label{subsec:external-entities}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{3cm}|L{1.8cm}|X|}
+\hline
+\textbf{Entity} & \textbf{Type} & \textbf{Description} \\
+\hline
+Monitored Servers & System & Servers running metric collection agents \\
+\hline
+DevOps Engineer & Actor & Views dashboards, configures alerts \\
+\hline
+Slack & System & Receives alert notifications via webhook \\
+\hline
+Email Service & System & Delivers alert emails via SMTP \\
+\hline
+External Apps & System & Push custom metrics via REST API \\
+\hline
+\end{tabularx}
+\caption{External Entities}
+\label{tab:external-entities}
+\end{table}

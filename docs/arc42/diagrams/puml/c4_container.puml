@@ -1,0 +1,30 @@
+@startuml c4_container
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Container Diagram - Nazar
+
+Person(user, "DevOps Engineer", "Monitors infrastructure")
+
+System_Boundary(nazar, "Nazar") {
+    Container(webapp, "Web Dashboard", "React", "Visualize metrics, configure alerts")
+    Container(api, "API Server", "FastAPI", "REST endpoints, metric ingestion")
+    Container(worker, "Analysis Worker", "Python", "Anomaly detection, alerting")
+    ContainerQueue(mq, "Message Broker", "RabbitMQ", "Async communication")
+    ContainerDb(db, "Database", "TimescaleDB", "Metric storage")
+}
+
+System_Ext(servers, "Monitored Servers", "Metric agents")
+System_Ext(slack, "Slack", "Notifications")
+System_Ext(email, "Email Service", "Notifications")
+
+Rel(user, webapp, "Uses", "HTTPS")
+Rel(webapp, api, "Calls", "REST API")
+Rel(servers, api, "Push metrics", "HTTPS")
+Rel(api, mq, "Publishes", "AMQP")
+Rel(api, db, "Reads/Writes", "SQL")
+Rel(worker, mq, "Consumes", "AMQP")
+Rel(worker, db, "Reads/Writes", "SQL")
+Rel(worker, slack, "Sends alerts", "Webhook")
+Rel(worker, email, "Sends alerts", "SMTP")
+
+@enduml

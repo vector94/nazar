@@ -1,0 +1,69 @@
+\section{Solution Strategy}
+\label{sec:solution-strategy}
+
+% ============================================================================
+\subsection{Technology Decisions}
+\label{subsec:technology-decisions}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{3cm}|L{2.5cm}|X|}
+\hline
+\textbf{Decision} & \textbf{Technology} & \textbf{Justification} \\
+\hline
+Backend Framework & FastAPI & Async support, auto API docs, Python native \\
+\hline
+Time-Series DB & TimescaleDB & SQL compatible, PostgreSQL ecosystem \\
+\hline
+Message Broker & RabbitMQ & Reliable delivery, decouples ingestion from processing \\
+\hline
+Frontend & React & Component-based, large ecosystem \\
+\hline
+Containerization & Docker & Portable, consistent deployment \\
+\hline
+\end{tabularx}
+\caption{Technology Decisions}
+\label{tab:technology-decisions}
+\end{table}
+
+% ============================================================================
+\subsection{Architectural Patterns}
+\label{subsec:architectural-patterns}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{3.5cm}|X|}
+\hline
+\textbf{Pattern} & \textbf{Justification} \\
+\hline
+Event-Driven & Decouple metric ingestion from analysis via message queues \\
+\hline
+Modular Monolith & Simple for solo development, easy to split later \\
+\hline
+Repository Pattern & Abstract database access for testability \\
+\hline
+\end{tabularx}
+\caption{Architectural Patterns}
+\label{tab:pattern-decisions}
+\end{table}
+
+% ============================================================================
+\subsection{Quality Goal Mapping}
+\label{subsec:quality-goal-mapping}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.2cm}|X|X|}
+\hline
+\textbf{Quality Goal} & \textbf{Scenario} & \textbf{Solution Approach} \\
+\hline
+Q1: Performance & 1000+ metrics/sec ingestion & Async FastAPI, RabbitMQ buffering, TimescaleDB hypertables \\
+\hline
+Q2: Reliability & System stays up during incidents & Health checks, message persistence, graceful degradation \\
+\hline
+Q3: Accuracy & Minimize false alerts & Configurable thresholds, baseline learning, ML tuning \\
+\hline
+\end{tabularx}
+\caption{Quality Goal Mapping}
+\label{tab:quality-mapping}
+\end{table}

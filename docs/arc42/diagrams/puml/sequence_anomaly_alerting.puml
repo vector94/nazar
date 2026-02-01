@@ -1,0 +1,19 @@
+@startuml sequence_anomaly_alerting
+!theme plain
+
+title Anomaly Detection and Alerting
+
+queue "RabbitMQ" as MQ
+participant "Analysis Worker" as Worker
+database "TimescaleDB" as DB
+participant "Slack / Email" as Notify
+actor "DevOps Engineer" as User
+
+MQ -> Worker : Consume metrics
+Worker -> DB : Query baseline data
+Worker -> Worker : Detect anomalies
+Worker -> DB : Store alert
+Worker -> Notify : Send notification
+Notify --> User : Alert received
+
+@enduml

@@ -1,0 +1,73 @@
+\section{Crosscutting Concepts}
+\label{sec:crosscutting}
+
+% ============================================================================
+\subsection{Patterns and Tactics}
+\label{subsec:patterns-tactics}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{3cm}|X|}
+\hline
+\textbf{Pattern/Tactic} & \textbf{Purpose} \\
+\hline
+Event-Driven & Decouples ingestion from analysis via RabbitMQ \\
+\hline
+Repository Pattern & Abstracts database operations \\
+\hline
+Async Processing & Fast API response by queuing work \\
+\hline
+Batch Processing & Groups metrics for efficient storage \\
+\hline
+Circuit Breaker & Handles external service failures gracefully \\
+\hline
+\end{tabularx}
+\caption{Patterns and Tactics}
+\label{tab:patterns-tactics}
+\end{table}
+
+% ============================================================================
+\subsection{Cross-cutting Concerns}
+\label{subsec:crosscutting-concerns}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|X|}
+\hline
+\textbf{Concern} & \textbf{Approach} \\
+\hline
+Logging & Structured JSON logs to stdout \\
+\hline
+Security & API key auth, HTTPS, input validation \\
+\hline
+Error Handling & Retry with backoff, dead letter queues \\
+\hline
+Configuration & Environment variables \\
+\hline
+\end{tabularx}
+\caption{Cross-cutting Concerns}
+\label{tab:crosscutting-impl}
+\end{table}
+
+% ============================================================================
+\subsection{Variability Points}
+\label{subsec:variability-guide}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{3cm}|X|}
+\hline
+\textbf{Element} & \textbf{Variation} \\
+\hline
+Notifier & Pluggable channels (Slack, Email, etc.) \\
+\hline
+ML Detector & Swappable algorithms (Isolation Forest, LSTM) \\
+\hline
+Metric Sources & Extensible via REST API or agents \\
+\hline
+Alert Rules & User-defined thresholds per metric \\
+\hline
+\end{tabularx}
+\caption{Variability Points}
+\label{tab:variability}
+\end{table}
