@@ -8,6 +8,7 @@ from sqlalchemy import select
 from shared import AsyncSessionLocal, Metric, QUEUE_NAME
 from shared.config import RABBITMQ_URL
 from .detector import check_thresholds
+from .ml_detector import check_ml_anomaly
 
 
 async def process_message(message: AbstractIncomingMessage):
@@ -28,10 +29,17 @@ async def process_message(message: AbstractIncomingMessage):
                 print(f"Metric not found: {host} @ {timestamp}")
                 return
 
+            # Check threshold-based alerts
             alerts = await check_thresholds(metric, session)
             for alert in alerts:
                 session.add(alert)
                 print(f"[ALERT] {alert.severity}: {alert.message}")
+
+            # Check ML-based anomalies
+            ml_alert = await check_ml_anomaly(metric, session)
+            if ml_alert:
+                session.add(ml_alert)
+                print(f"[ML-ALERT] {ml_alert.severity}: {ml_alert.message}")
 
             await session.commit()
 
