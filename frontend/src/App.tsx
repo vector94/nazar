@@ -1,4 +1,5 @@
-import { useMetricsSSE, Metric } from './hooks/useMetricsSSE';
+import { useMetricsSSE } from './hooks/useMetricsSSE';
+import type { Metric } from './hooks/useMetricsSSE';
 import './App.css';
 
 function MetricCard({ label, value, unit, color }: {
