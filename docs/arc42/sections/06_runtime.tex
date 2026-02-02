@@ -1,7 +1,7 @@
 \section{Runtime View}
 \label{sec:runtime}
 
-This section describes the behavior of Nazar's building blocks through two key runtime scenarios.
+This section describes the behavior of Nazar's building blocks through three key runtime scenarios.
 
 % ============================================================================
 \subsection{Runtime Scenario 1: Metric Collection and Storage}
@@ -85,4 +85,45 @@ Slack / Email & Delivers notifications to users \\
 \end{tabularx}
 \caption{Scenario 2: Participating Components}
 \label{tab:scenario2-blocks}
+\end{table}
+
+% ============================================================================
+\subsection{Runtime Scenario 3: Real-time Dashboard Updates}
+\label{subsec:runtime-scenario3}
+
+This scenario shows how the dashboard receives real-time updates via Server-Sent Events (SSE).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{diagrams/images/sequence_sse_realtime.png}
+    \caption{Real-time Dashboard Updates via SSE}
+    \label{fig:sequence-sse}
+\end{figure}
+
+\subsubsection{Interaction Steps}
+
+\begin{enumerate}
+    \item DevOps Engineer opens the Web Dashboard
+    \item Dashboard establishes SSE connection to API Server
+    \item API Server queries TimescaleDB for latest metrics
+    \item API Server pushes metric data as SSE events
+    \item Dashboard updates visualizations in real-time
+    \item Connection remains open for continuous updates
+\end{enumerate}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{3cm}|X|}
+\hline
+\textbf{Component} & \textbf{Role} \\
+\hline
+Web Dashboard & Displays metrics and maintains SSE connection \\
+\hline
+API Server & Streams real-time updates via SSE \\
+\hline
+TimescaleDB & Provides metric data for streaming \\
+\hline
+\end{tabularx}
+\caption{Scenario 3: Participating Components}
+\label{tab:scenario3-blocks}
 \end{table}

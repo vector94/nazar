@@ -1,0 +1,23 @@
+@startuml sequence_sse_realtime
+!theme plain
+
+title Real-time Dashboard Updates via SSE
+
+actor "DevOps Engineer" as User
+participant "Web Dashboard" as Dashboard
+participant "API Server" as API
+database "TimescaleDB" as DB
+
+User -> Dashboard : Opens dashboard
+Dashboard -> API : GET /api/v1/stream (SSE)
+activate API
+
+loop On new metrics
+    API -> DB : Query latest metrics
+    API --> Dashboard : SSE event (metric data)
+    Dashboard -> Dashboard : Update visualizations
+end
+
+note right of API : Connection stays open\nServer pushes updates
+
+@enduml

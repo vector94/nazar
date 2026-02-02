@@ -20,7 +20,7 @@
 \hline
 Web Dashboard & React frontend for metric visualization and alert configuration \\
 \hline
-API Server & FastAPI backend handling REST endpoints and metric ingestion \\
+API Server & FastAPI backend handling REST endpoints, metric ingestion, and SSE streaming \\
 \hline
 Analysis Worker & Python service for anomaly detection and alert triggering \\
 \hline
@@ -53,6 +53,8 @@ Database & TimescaleDB for time-series metric storage \\
 Ingestion Controller & Receives metrics from agents and external sources \\
 \hline
 Query Controller & Serves metric queries for the dashboard \\
+\hline
+SSE Controller & Pushes real-time metric updates to the dashboard \\
 \hline
 Config Controller & Manages alert rules and thresholds \\
 \hline

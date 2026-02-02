@@ -143,3 +143,26 @@
 \caption{ADR-007: Alert Delivery Strategy}
 \label{tab:adr007}
 \end{table}
+
+% ============================================================================
+\subsection{ADR-008: Server-Sent Events for Dashboard}
+\label{subsec:adr008}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{|L{2.5cm}|X|}
+\hline
+\textbf{Context} & Dashboard needs real-time metric updates without constant polling \\
+\hline
+\textbf{Alternatives} & Polling (client requests every N seconds), WebSocket (bidirectional), SSE (server-to-client push) \\
+\hline
+\textbf{Decision} & Server-Sent Events (SSE) for pushing metrics and alerts to dashboard \\
+\hline
+\textbf{Rationale} & Dashboard only needs one-way server-to-client push. SSE is simpler than WebSocket, has automatic reconnection, works over standard HTTP, and is sufficient for our use case. WebSocket would add complexity for bidirectional capability we don't need. \\
+\hline
+\textbf{Consequences} & + Simpler than WebSocket \newline + Automatic reconnection built into browser API \newline + Works with standard HTTP infrastructure \newline - Cannot send client-to-server messages (not needed) \\
+\hline
+\end{tabularx}
+\caption{ADR-008: Server-Sent Events for Dashboard}
+\label{tab:adr008}
+\end{table}
