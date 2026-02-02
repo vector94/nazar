@@ -1,0 +1,168 @@
+* {
+  box-sizing: border-box;
+}
+
+.dashboard {
+  min-height: 100vh;
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 2rem;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #334155;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
+}
+
+.connection-status {
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.connection-status.connected {
+  background: #065f46;
+  color: #34d399;
+}
+
+.connection-status.disconnected {
+  background: #7f1d1d;
+  color: #fca5a5;
+}
+
+.error-banner {
+  background: #7f1d1d;
+  color: #fca5a5;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.hosts-section, .recent-section {
+  margin-bottom: 2rem;
+}
+
+.hosts-section h2, .recent-section h2 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  color: #94a3b8;
+}
+
+.hosts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.host-card {
+  background: #1e293b;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+}
+
+.host-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.host-name {
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.host-time {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.metric-card {
+  background: #0f172a;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  border-left: 3px solid;
+  transition: background 0.2s;
+}
+
+.metric-card.high {
+  background: #450a0a;
+}
+
+.metric-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.metric-unit {
+  font-size: 0.875rem;
+  font-weight: 400;
+  margin-left: 0.125rem;
+}
+
+.no-data {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+  background: #1e293b;
+  border-radius: 0.75rem;
+}
+
+.activity-list {
+  background: #1e293b;
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.activity-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #334155;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-host {
+  font-weight: 500;
+  color: #f1f5f9;
+  min-width: 150px;
+}
+
+.activity-metrics {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-family: monospace;
+}
+
+.activity-time {
+  font-size: 0.75rem;
+  color: #64748b;
+}
