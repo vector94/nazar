@@ -1,10 +1,13 @@
+import asyncio
+import json
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 from fastapi import FastAPI, Depends, Query, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from shared import get_session, Metric, Alert, publish_metric
+from shared import get_session, Metric, Alert, publish_metric, AsyncSessionLocal
 from .schemas import MetricCreate, MetricResponse, AlertResponse, AlertUpdate
 
 app = FastAPI(
@@ -94,3 +97,48 @@ async def update_alert(
     await session.commit()
     await session.refresh(alert)
     return alert
+
+
+async def metrics_stream(host: Optional[str] = None):
+    """Generator that yields SSE events with latest metrics."""
+    last_timestamp = None
+
+    while True:
+        async with AsyncSessionLocal() as session:
+            query = select(Metric).order_by(Metric.timestamp.desc()).limit(10)
+            if host:
+                query = query.where(Metric.host == host)
+            if last_timestamp:
+                query = query.where(Metric.timestamp > last_timestamp)
+
+            result = await session.execute(query)
+            metrics = result.scalars().all()
+
+            if metrics:
+                last_timestamp = metrics[0].timestamp
+                for metric in reversed(metrics):
+                    data = {
+                        "timestamp": metric.timestamp.isoformat(),
+                        "host": metric.host,
+                        "cpu_percent": metric.cpu_percent,
+                        "memory_percent": metric.memory_percent,
+                        "disk_percent": metric.disk_percent,
+                        "network_in": metric.network_in,
+                        "network_out": metric.network_out,
+                    }
+                    yield f"data: {json.dumps(data)}\n\n"
+
+        await asyncio.sleep(1)
+
+
+@app.get("/stream")
+async def stream_metrics(host: Optional[str] = None):
+    """SSE endpoint for real-time metric updates."""
+    return StreamingResponse(
+        metrics_stream(host),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+        },
+    )
