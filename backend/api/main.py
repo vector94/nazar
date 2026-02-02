@@ -4,8 +4,8 @@ from fastapi import FastAPI, Depends, Query
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from shared import get_session, Metric
-from .schemas import MetricCreate, MetricResponse
+from shared import get_session, Metric, Alert
+from .schemas import MetricCreate, MetricResponse, AlertResponse
 
 app = FastAPI(
     title="Nazar API",
@@ -51,6 +51,27 @@ async def get_metrics(
         query = query.where(Metric.timestamp >= start)
     if end:
         query = query.where(Metric.timestamp <= end)
+
+    result = await session.execute(query)
+    return result.scalars().all()
+
+
+@app.get("/alerts", response_model=list[AlertResponse])
+async def get_alerts(
+    host: Optional[str] = None,
+    severity: Optional[str] = None,
+    status: Optional[str] = None,
+    limit: int = Query(default=100, le=1000),
+    session: AsyncSession = Depends(get_session),
+):
+    query = select(Alert).order_by(Alert.timestamp.desc()).limit(limit)
+
+    if host:
+        query = query.where(Alert.host == host)
+    if severity:
+        query = query.where(Alert.severity == severity)
+    if status:
+        query = query.where(Alert.status == status)
 
     result = await session.execute(query)
     return result.scalars().all()

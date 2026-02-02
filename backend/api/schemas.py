@@ -24,3 +24,16 @@ class MetricResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class AlertResponse(BaseModel):
+    id: int
+    timestamp: datetime
+    host: str
+    metric_type: str
+    severity: str
+    message: Optional[str] = None
+    status: str
+
+    class Config:
+        from_attributes = True
+
