@@ -3,6 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from shared import Metric, Alert
+from .notifier import send_slack_alert
 
 THRESHOLDS = {
     "cpu_percent": {"warning": 70, "critical": 90},
@@ -35,14 +36,16 @@ async def check_thresholds(metric: Metric, session: AsyncSession) -> list[Alert]
             if existing.scalar():
                 continue
 
+            message = f"{metric_type} is {value:.1f}% on {metric.host}"
             alert = Alert(
                 timestamp=datetime.now(timezone.utc),
                 host=metric.host,
                 metric_type=metric_type,
                 severity=severity,
-                message=f"{metric_type} is {value:.1f}% on {metric.host}",
+                message=message,
                 status="pending",
             )
             alerts.append(alert)
+            await send_slack_alert(severity, message)
 
     return alerts

@@ -4,7 +4,7 @@ from fastapi import FastAPI, Depends, Query, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from shared import get_session, Metric, Alert
+from shared import get_session, Metric, Alert, publish_metric
 from .schemas import MetricCreate, MetricResponse, AlertResponse, AlertUpdate
 
 app = FastAPI(
@@ -32,6 +32,7 @@ async def ingest_metric(metric: MetricCreate, session: AsyncSession = Depends(ge
     )
     session.add(db_metric)
     await session.commit()
+    await publish_metric(db_metric.host, db_metric.timestamp.isoformat())
     return {"status": "ok"}
 
 
