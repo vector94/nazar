@@ -16,8 +16,7 @@ async def check_thresholds(metric: Metric, session: AsyncSession) -> list[Alert]
     alerts = []
 
     for metric_type, levels in THRESHOLDS.items():
-        # Use max value if available (catches spikes), fall back to average
-        prefix = metric_type.split("_")[0]  # cpu, memory, disk
+        prefix = metric_type.split("_")[0]
         value = getattr(metric, f"{prefix}_max", None) or getattr(metric, metric_type)
         if value is None:
             continue

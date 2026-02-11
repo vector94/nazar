@@ -42,7 +42,6 @@ function HostMetrics({ metric }: { metric: Metric }) {
 function App() {
   const { metrics, connected, error } = useMetricsSSE();
 
-  // Group metrics by host, keeping only the latest for each
   const latestByHost = metrics.reduce((acc, metric) => {
     if (!acc[metric.host]) {
       acc[metric.host] = metric;

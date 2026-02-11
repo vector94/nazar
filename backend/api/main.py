@@ -1,6 +1,6 @@
 import asyncio
 import json
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from typing import Optional
 from fastapi import FastAPI, Depends, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -115,7 +115,6 @@ async def update_alert(
 
 
 async def metrics_stream(host: Optional[str] = None):
-    """Generator that yields SSE events with latest metrics."""
     last_timestamp = None
 
     while True:
@@ -154,7 +153,6 @@ async def metrics_stream(host: Optional[str] = None):
 
 @app.get("/stream")
 async def stream_metrics(host: Optional[str] = None):
-    """SSE endpoint for real-time metric updates."""
     return StreamingResponse(
         metrics_stream(host),
         media_type="text/event-stream",

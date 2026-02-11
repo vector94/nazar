@@ -29,13 +29,11 @@ async def process_message(message: AbstractIncomingMessage):
                 print(f"Metric not found: {host} @ {timestamp}")
                 return
 
-            # Check threshold-based alerts
             alerts = await check_thresholds(metric, session)
             for alert in alerts:
                 session.add(alert)
                 print(f"[ALERT] {alert.severity}: {alert.message}")
 
-            # Check ML-based anomalies
             ml_alert = await check_ml_anomaly(metric, session)
             if ml_alert:
                 session.add(ml_alert)

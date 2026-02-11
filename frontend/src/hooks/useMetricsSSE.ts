@@ -4,8 +4,14 @@ export interface Metric {
   timestamp: string;
   host: string;
   cpu_percent: number | null;
+  cpu_min: number | null;
+  cpu_max: number | null;
   memory_percent: number | null;
+  memory_min: number | null;
+  memory_max: number | null;
   disk_percent: number | null;
+  disk_min: number | null;
+  disk_max: number | null;
   network_in: number | null;
   network_out: number | null;
 }
@@ -30,7 +36,7 @@ export function useMetricsSSE(host?: string) {
       try {
         const metric: Metric = JSON.parse(event.data);
         setMetrics((prev) => {
-          const updated = [metric, ...prev].slice(0, 50); // Keep last 50
+          const updated = [metric, ...prev].slice(0, 50);
           return updated;
         });
       } catch (e) {
@@ -42,7 +48,6 @@ export function useMetricsSSE(host?: string) {
       setConnected(false);
       setError('Connection lost. Reconnecting...');
       eventSource.close();
-      // Auto-reconnect after 3 seconds
       setTimeout(connect, 3000);
     };
 
