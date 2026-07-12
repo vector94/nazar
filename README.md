@@ -2,28 +2,19 @@
 
 A performance monitoring platform that collects system metrics, detects anomalies using statistical thresholds and machine learning, and sends alerts before issues escalate.
 
+![Nazar dashboard streaming live host metrics](assets/dashboard.png)
+
 ## How It Works
 
-```
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Agents    │────▶│  API Server │────▶│  Dashboard  │
-│  (metrics)  │     │  (FastAPI)  │     │   (React)   │
-└─────────────┘     └──────┬──────┘     └─────────────┘
-                          │                    ▲
-                    ┌─────▼─────┐              │
-                    │ RabbitMQ  │         SSE Stream
-                    └─────┬─────┘              │
-                          │                    │
-                    ┌─────▼─────┐     ┌────────┴────────┐
-                    │  Worker   │────▶│   TimescaleDB   │
-                    │ (Anomaly  │     │  (Time-series)  │
-                    │ Detection)│     └─────────────────┘
-                    └─────┬─────┘
-                          │
-                    ┌─────▼─────┐
-                    │   Slack   │
-                    │  Alerts   │
-                    └───────────┘
+```mermaid
+flowchart LR
+    Agent["Agent<br/>(psutil collector)"] -->|POST /metrics| API["API Server<br/>(FastAPI)"]
+    API -->|store| DB[("TimescaleDB")]
+    API -->|publish| MQ[["RabbitMQ"]]
+    MQ -->|consume| Worker["Worker<br/>(threshold + ML<br/>anomaly detection)"]
+    Worker <-->|read metrics /<br/>write alerts| DB
+    Worker -->|notify| Slack["Slack"]
+    API -->|SSE stream| Dashboard["Dashboard<br/>(React)"]
 ```
 
 1. **Agents** sample system metrics every 1 second and send aggregated data (min/max/avg) every 10 seconds
@@ -36,27 +27,33 @@ A performance monitoring platform that collects system metrics, detects anomalie
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| API | Python, FastAPI |
-| Database | TimescaleDB (PostgreSQL) |
-| Message Queue | RabbitMQ |
-| ML | scikit-learn (Isolation Forest) |
-| Frontend | React, TypeScript, Vite |
-| Agent | Python, psutil |
+| Layer         | Technology                      |
+| ------------- | ------------------------------- |
+| API           | Python, FastAPI                 |
+| Database      | TimescaleDB (PostgreSQL)        |
+| Message Queue | RabbitMQ                        |
+| ML            | scikit-learn (Isolation Forest) |
+| Frontend      | React, TypeScript, Vite         |
+| Agent         | Python, psutil                  |
 
 ## Project Structure
 
 ```
 nazar/
+├── agent/                 # System metric collector (psutil)
+│   ├── collector.py       #   samples CPU, memory, disk, network
+│   └── main.py            #   aggregation + send loop
 ├── backend/
-│   ├── api/           # FastAPI REST + SSE endpoints
-│   ├── worker/        # Anomaly detection (threshold + ML)
-│   └── shared/        # Database models, RabbitMQ client
-├── frontend/          # React dashboard
-├── agent/             # System metric collector
-├── docker/            # Docker Compose for infrastructure
-└── docs/arc42/        # Architecture documentation
+│   ├── api/               # FastAPI REST + SSE endpoints
+│   ├── worker/            # RabbitMQ consumer
+│   │   ├── detector.py    #   threshold-based detection
+│   │   ├── ml_detector.py #   Isolation Forest detection
+│   │   └── notifier.py    #   Slack alerts
+│   └── shared/            # SQLAlchemy models, DB session, RabbitMQ client
+├── frontend/              # React dashboard (Vite + TypeScript)
+├── docker/                # Docker Compose (TimescaleDB, RabbitMQ)
+├── assets/                # README screenshots
+└── docs/arc42/            # Architecture documentation
 ```
 
 ## Quick Start
@@ -89,18 +86,26 @@ npm run dev
 ```
 
 **Access:**
+
 - Dashboard: http://localhost:5173
 - API Docs: http://localhost:8000/docs
 
+<details>
+<summary>📷 API documentation (Swagger UI)</summary>
+
+![Interactive API documentation](assets/api-docs.png)
+
+</details>
+
 ## Configuration
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql+asyncpg://nazar:nazar@localhost:5432/nazar` |
-| `RABBITMQ_URL` | RabbitMQ connection string | `amqp://guest:guest@localhost:5672/` |
-| `SLACK_WEBHOOK_URL` | Slack incoming webhook URL | - |
-| `NAZAR_API_URL` | API URL for agent | `http://localhost:8000` |
-| `NAZAR_INTERVAL` | Agent collection interval (seconds) | `10` |
+| Variable              | Description                         | Default                                                   |
+| --------------------- | ----------------------------------- | --------------------------------------------------------- |
+| `DATABASE_URL`      | PostgreSQL connection string        | `postgresql+asyncpg://nazar:nazar@localhost:5432/nazar` |
+| `RABBITMQ_URL`      | RabbitMQ connection string          | `amqp://guest:guest@localhost:5672/`                    |
+| `SLACK_WEBHOOK_URL` | Slack incoming webhook URL          | -                                                         |
+| `NAZAR_API_URL`     | API URL for agent                   | `http://localhost:8000`                                 |
+| `NAZAR_INTERVAL`    | Agent collection interval (seconds) | `10`                                                    |
 
 ## Documentation
 
@@ -109,6 +114,7 @@ For detailed architecture decisions, component diagrams, and runtime scenarios, 
 **[📄 Architecture Document (PDF)](docs/arc42/nazar-architecture.pdf)**
 
 The documentation covers:
+
 - System context and building blocks
 - Architectural decisions (ADRs)
 - Runtime scenarios
