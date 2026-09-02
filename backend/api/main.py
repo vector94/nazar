@@ -59,7 +59,7 @@ async def get_metrics(
     host: Optional[str] = None,
     start: Optional[datetime] = None,
     end: Optional[datetime] = None,
-    limit: int = Query(default=100, le=1000),
+    limit: int = Query(default=100, ge=1, le=1000),
     session: AsyncSession = Depends(get_session),
 ):
     query = select(Metric).order_by(Metric.timestamp.desc()).limit(limit)
@@ -80,7 +80,7 @@ async def get_alerts(
     host: Optional[str] = None,
     severity: Optional[str] = None,
     status: Optional[str] = None,
-    limit: int = Query(default=100, le=1000),
+    limit: int = Query(default=100, ge=1, le=1000),
     session: AsyncSession = Depends(get_session),
 ):
     query = select(Alert).order_by(Alert.timestamp.desc()).limit(limit)

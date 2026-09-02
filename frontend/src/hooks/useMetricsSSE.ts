@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 export interface Metric {
   timestamp: string;
@@ -17,47 +17,57 @@ export interface Metric {
 }
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const MAX_METRICS = 50;
+const RECONNECT_MS = 3000;
 
 export function useMetricsSSE(host?: string) {
   const [metrics, setMetrics] = useState<Metric[]>([]);
   const [connected, setConnected] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const connect = useCallback(() => {
-    const url = host ? `${API_URL}/stream?host=${host}` : `${API_URL}/stream`;
-    const eventSource = new EventSource(url);
-
-    eventSource.onopen = () => {
-      setConnected(true);
-      setError(null);
-    };
-
-    eventSource.onmessage = (event) => {
-      try {
-        const metric: Metric = JSON.parse(event.data);
-        setMetrics((prev) => {
-          const updated = [metric, ...prev].slice(0, 50);
-          return updated;
-        });
-      } catch (e) {
-        console.error('Failed to parse metric:', e);
-      }
-    };
-
-    eventSource.onerror = () => {
-      setConnected(false);
-      setError('Connection lost. Reconnecting...');
-      eventSource.close();
-      setTimeout(connect, 3000);
-    };
-
-    return eventSource;
-  }, [host]);
-
   useEffect(() => {
-    const eventSource = connect();
-    return () => eventSource.close();
-  }, [connect]);
+    let disposed = false;
+    let source: EventSource | null = null;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const connect = () => {
+      if (disposed) return;
+      const url = host
+        ? `${API_URL}/stream?host=${encodeURIComponent(host)}`
+        : `${API_URL}/stream`;
+      source = new EventSource(url);
+
+      source.onopen = () => {
+        setConnected(true);
+        setError(null);
+      };
+
+      source.onmessage = (event) => {
+        try {
+          const metric: Metric = JSON.parse(event.data);
+          setMetrics((prev) => [metric, ...prev].slice(0, MAX_METRICS));
+        } catch (e) {
+          console.error('Failed to parse metric:', e);
+        }
+      };
+
+      source.onerror = () => {
+        setConnected(false);
+        setError('Connection lost. Reconnecting...');
+        source?.close();
+        source = null;
+        if (!disposed) retryTimer = setTimeout(connect, RECONNECT_MS);
+      };
+    };
+
+    connect();
+
+    return () => {
+      disposed = true;
+      clearTimeout(retryTimer);
+      source?.close();
+    };
+  }, [host]);
 
   return { metrics, connected, error };
 }

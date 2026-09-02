@@ -1,121 +1,94 @@
 # Nazar
 
-A performance monitoring platform that collects system metrics, detects anomalies using statistical thresholds and machine learning, and sends alerts before issues escalate.
+A performance monitoring platform: agents collect system metrics, a worker flags
+anomalies with threshold rules and an Isolation Forest model, and alerts go to
+Slack. A React dashboard streams the data live.
 
-![Nazar dashboard streaming live host metrics](assets/dashboard.png)
+![Nazar dashboard](assets/dashboard.png)
 
-## How It Works
+## Architecture
 
 ```mermaid
 flowchart LR
-    Agent["Agent<br/>(psutil collector)"] -->|POST /metrics| API["API Server<br/>(FastAPI)"]
+    Agent["Agent<br/>(psutil)"] -->|POST /metrics| API["API<br/>(FastAPI)"]
     API -->|store| DB[("TimescaleDB")]
     API -->|publish| MQ[["RabbitMQ"]]
-    MQ -->|consume| Worker["Worker<br/>(threshold + ML<br/>anomaly detection)"]
-    Worker <-->|read metrics /<br/>write alerts| DB
+    MQ -->|consume| Worker["Worker<br/>(threshold + ML)"]
+    Worker <-->|metrics / alerts| DB
     Worker -->|notify| Slack["Slack"]
-    API -->|SSE stream| Dashboard["Dashboard<br/>(React)"]
+    API -->|SSE| Dashboard["Dashboard<br/>(React)"]
 ```
 
-1. **Agents** sample system metrics every 1 second and send aggregated data (min/max/avg) every 10 seconds
-2. **API Server** stores metrics in TimescaleDB and publishes to RabbitMQ
-3. **Worker** consumes messages and runs anomaly detection:
-   - Threshold-based: alerts when metrics exceed configured limits
-   - ML-based: Isolation Forest detects unusual patterns in metric combinations
-4. **Alerts** are sent to Slack when anomalies are detected
-5. **Dashboard** displays real-time metrics via Server-Sent Events (SSE)
+Agents sample once per second and POST a 10-second min/max/avg aggregate. The API
+stores each metric in TimescaleDB and publishes a notification to RabbitMQ. The
+worker reads the metric back, runs threshold checks and Isolation Forest
+detection, writes any alerts, and posts them to Slack. The dashboard consumes a
+live SSE feed from the API.
 
-## Tech Stack
+## Stack
 
-| Layer         | Technology                      |
-| ------------- | ------------------------------- |
-| API           | Python, FastAPI                 |
-| Database      | TimescaleDB (PostgreSQL)        |
-| Message Queue | RabbitMQ                        |
-| ML            | scikit-learn (Isolation Forest) |
-| Frontend      | React, TypeScript, Vite         |
-| Agent         | Python, psutil                  |
+| Layer    | Technology                      |
+| -------- | ------------------------------- |
+| API      | Python, FastAPI                 |
+| Database | TimescaleDB (PostgreSQL)        |
+| Queue    | RabbitMQ                        |
+| ML       | scikit-learn (Isolation Forest) |
+| Frontend | React, TypeScript, Vite         |
+| Agent    | Python, psutil                  |
 
-## Project Structure
+## Layout
 
 ```
-nazar/
-├── agent/                 # System metric collector (psutil)
-│   ├── collector.py       #   samples CPU, memory, disk, network
-│   └── main.py            #   aggregation + send loop
-├── backend/
-│   ├── api/               # FastAPI REST + SSE endpoints
-│   ├── worker/            # RabbitMQ consumer
-│   │   ├── detector.py    #   threshold-based detection
-│   │   ├── ml_detector.py #   Isolation Forest detection
-│   │   └── notifier.py    #   Slack alerts
-│   └── shared/            # SQLAlchemy models, DB session, RabbitMQ client
-├── frontend/              # React dashboard (Vite + TypeScript)
-├── docker/                # Docker Compose (TimescaleDB, RabbitMQ)
-├── assets/                # README screenshots
-└── docs/arc42/            # Architecture documentation
+agent/       psutil collector + aggregation/send loop
+backend/
+  api/       FastAPI REST + SSE endpoints
+  worker/    RabbitMQ consumer: threshold + ML detection, Slack alerts
+  shared/    SQLAlchemy models, DB session, RabbitMQ client
+frontend/    React dashboard (Vite)
+docker/      Compose file for TimescaleDB + RabbitMQ
+docs/arc42/  Architecture documentation
 ```
 
-## Quick Start
+## Running locally
 
-**Prerequisites:** Docker, Python 3.9+, Node.js 18+
+Requires Docker, Python 3.9+, and Node.js 18+.
 
 ```bash
-# 1. Start infrastructure (TimescaleDB + RabbitMQ)
-cd docker && docker-compose up -d
+# infrastructure
+cd docker && docker compose up -d
 
-# 2. Configure environment
-cp backend/.env.example backend/.env
-# Edit backend/.env with your Slack webhook URL
-
-# 3. Install and run backend
+# backend
 cd backend
+cp .env.example .env          # set SLACK_WEBHOOK_URL for alerts
 pip install -r requirements.txt
+python -m shared.init_db      # first run only
 python -m uvicorn api.main:app --port 8000 &
 python -m worker.main &
 
-# 4. Install and run agent
-cd agent
+# agent
+cd ../agent
 pip install -r requirements.txt
 python main.py &
 
-# 5. Install and run dashboard
-cd frontend
+# dashboard
+cd ../frontend
 npm install
 npm run dev
 ```
 
-**Access:**
-
-- Dashboard: http://localhost:5173
-- API Docs: http://localhost:8000/docs
-
-<details>
-<summary>📷 API documentation (Swagger UI)</summary>
-
-![Interactive API documentation](assets/api-docs.png)
-
-</details>
+Dashboard: http://localhost:5173 · API docs: http://localhost:8000/docs
 
 ## Configuration
 
-| Variable              | Description                         | Default                                                   |
-| --------------------- | ----------------------------------- | --------------------------------------------------------- |
-| `DATABASE_URL`      | PostgreSQL connection string        | `postgresql+asyncpg://nazar:nazar@localhost:5432/nazar` |
-| `RABBITMQ_URL`      | RabbitMQ connection string          | `amqp://guest:guest@localhost:5672/`                    |
-| `SLACK_WEBHOOK_URL` | Slack incoming webhook URL          | -                                                         |
-| `NAZAR_API_URL`     | API URL for agent                   | `http://localhost:8000`                                 |
-| `NAZAR_INTERVAL`    | Agent collection interval (seconds) | `10`                                                    |
+| Variable            | Description                                          | Default                                                   |
+| ------------------- | --------------------------------------------------- | --------------------------------------------------------- |
+| `DATABASE_URL`      | PostgreSQL connection string                        | `postgresql+asyncpg://nazar:nazar123@localhost:5433/nazar` |
+| `RABBITMQ_URL`      | RabbitMQ connection string                          | `amqp://nazar:nazar123@localhost:5672/`                    |
+| `SLACK_WEBHOOK_URL` | Slack incoming webhook; alerts are log-only if unset | –                                                        |
+| `NAZAR_API_URL`     | API URL the agent posts to                          | `http://localhost:8000`                                    |
+| `NAZAR_HOSTNAME`    | Host label reported by the agent                    | system hostname                                            |
+| `NAZAR_INTERVAL`    | Agent send interval, seconds                        | `10`                                                      |
 
 ## Documentation
 
-For detailed architecture decisions, component diagrams, and runtime scenarios, see the arc42 documentation:
-
-**[📄 Architecture Document (PDF)](docs/arc42/nazar-architecture.pdf)**
-
-The documentation covers:
-
-- System context and building blocks
-- Architectural decisions (ADRs)
-- Runtime scenarios
-- Quality requirements
+Architecture decisions, C4 diagrams, and runtime scenarios: [docs/arc42/nazar-architecture.pdf](docs/arc42/nazar-architecture.pdf).

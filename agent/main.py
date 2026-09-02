@@ -46,7 +46,7 @@ def send_metrics(metrics: dict):
 
 
 def main():
-    print(f"Nazar Agent starting...")
+    print("Nazar Agent starting...")
     print(f"  API: {API_URL}")
     print(f"  Host: {HOSTNAME}")
     print(f"  Interval: {INTERVAL}s (sampling every 1s)")

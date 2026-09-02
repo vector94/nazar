@@ -23,7 +23,8 @@ class AnomalyDetector:
         values = []
         for name in self.feature_names:
             prefix = name.split("_")[0]
-            val = getattr(metric, f"{prefix}_max", None) or getattr(metric, name)
+            max_val = getattr(metric, f"{prefix}_max", None)
+            val = max_val if max_val is not None else getattr(metric, name)
             if val is None:
                 return None
             values.append(val)
@@ -109,7 +110,7 @@ async def check_ml_anomaly(metric: Metric, session: AsyncSession) -> Optional[Al
         return None
 
     score = detector.get_anomaly_score(metric)
-    score_str = f" (score: {score:.3f})" if score else ""
+    score_str = f" (score: {score:.3f})" if score is not None else ""
 
     message = (
         f"ML anomaly detected on {metric.host}: "

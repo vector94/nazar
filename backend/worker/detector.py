@@ -17,7 +17,8 @@ async def check_thresholds(metric: Metric, session: AsyncSession) -> list[Alert]
 
     for metric_type, levels in THRESHOLDS.items():
         prefix = metric_type.split("_")[0]
-        value = getattr(metric, f"{prefix}_max", None) or getattr(metric, metric_type)
+        max_val = getattr(metric, f"{prefix}_max", None)
+        value = max_val if max_val is not None else getattr(metric, metric_type)
         if value is None:
             continue
 

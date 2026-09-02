@@ -38,7 +38,7 @@ function Sparkline({ points, color }: { points: Point[]; color: string }) {
   const area = `${line} L${px(points.length - 1).toFixed(1)},${SPARK_H} L${px(0).toFixed(1)},${SPARK_H} Z`;
 
   const lastIdx = points.length - 1;
-  const dotIdx = hoverIdx ?? lastIdx;
+  const dotIdx = Math.min(hoverIdx ?? lastIdx, lastIdx);
   const dot = points[dotIdx];
   const dotLeft = (px(dotIdx) / SPARK_W) * 100;
   const dotTop = (py(dot.v) / SPARK_H) * 100;
@@ -195,7 +195,7 @@ function App() {
     const m = metrics[i];
     (byHost[m.host] ??= []).push(m);
   }
-  const hosts = Object.values(byHost);
+  const hosts = Object.values(byHost).sort((a, b) => a[0].host.localeCompare(b[0].host));
 
   return (
     <div className="dashboard">
