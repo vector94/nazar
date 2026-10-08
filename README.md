@@ -25,6 +25,12 @@ worker reads the metric back, runs threshold checks and Isolation Forest
 detection, writes any alerts, and posts them to Slack. The dashboard consumes a
 live SSE feed from the API.
 
+Threshold alerts are tracked per host and metric, with at most one open
+(`pending` or `acknowledged`) at a time. Crossing a threshold raises one; rising
+from warning to critical replaces it with a critical alert; dropping back below
+the warning level marks it `resolved`. Acknowledging an alert
+(`PATCH /alerts/{id}`) keeps it open without raising it again.
+
 ## Stack
 
 | Layer    | Technology                      |
@@ -44,6 +50,7 @@ backend/
   api/       FastAPI REST + SSE endpoints
   worker/    RabbitMQ consumer: threshold + ML detection, Slack alerts
   shared/    SQLAlchemy models, DB session, RabbitMQ client
+  tests/     pytest suite
 frontend/    React dashboard (Vite)
 docker/      Compose file for TimescaleDB + RabbitMQ
 docs/arc42/  Architecture documentation
@@ -77,6 +84,17 @@ npm run dev
 ```
 
 Dashboard: http://localhost:5173 · API docs: http://localhost:8000/docs
+
+## Tests
+
+The backend tests run against a temporary SQLite database, so they don't need
+Docker.
+
+```bash
+cd backend
+pip install -r requirements-dev.txt
+python -m pytest
+```
 
 ## Configuration
 
